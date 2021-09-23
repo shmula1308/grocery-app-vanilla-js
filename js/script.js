@@ -7,9 +7,22 @@ input.addEventListener("input", onInputChangeHandler);
 const groceryList = document.querySelector(".grocery-list");
 groceryList.addEventListener("click", itemActionsHandler);
 
+const clearListButton = document.querySelector(".reset-btn");
+clearListButton.addEventListener("click", resetAppHandler);
+
 let inputText = null;
 let itemId = null;
-const groceryItems = [];
+let isEditing = false;
+let groceryItems = [];
+
+function resetAppHandler() {
+  groceryList.innerHTML = "";
+  form.reset();
+  inputText = null;
+  itemId = null;
+  isEditing = false;
+  groceryItems = [];
+}
 
 function onInputChangeHandler(ev) {
   inputText = ev.target.value;
@@ -18,15 +31,43 @@ function onInputChangeHandler(ev) {
 function onSubmitHandler(ev) {
   ev.preventDefault();
 
+  const enteredText = input.value.trim();
+  if (!enteredText) {
+    return;
+  }
+
+  if (isEditing) {
+    const existingItemIndex = groceryItems.findIndex((item) => item.id === itemId);
+
+    const updatedItem = {
+      name: enteredText,
+      id: itemId,
+    };
+    groceryItems[existingItemIndex] = updatedItem;
+    updatedDisplayedItem(itemId, enteredText);
+
+    inputText = null;
+    itemId = null;
+    isEditing = false;
+    changeButtonHandler();
+    form.reset();
+    return;
+  }
+
   const groceryItem = {
-    name: input.value,
-    id: Math.random() * 100,
+    name: enteredText,
+    id: (Math.random() * 100).toString(),
   };
 
   groceryItems.push(groceryItem);
   displayItem(groceryItem);
 
   form.reset();
+}
+
+function updatedDisplayedItem(id, groceryName) {
+  const displayedItem = document.getElementById(id);
+  displayedItem.querySelector(".grocery-name").innerHTML = groceryName;
 }
 
 function displayItem(item) {
@@ -82,11 +123,25 @@ function itemActionsHandler(ev) {
   const editAction = button.classList.contains("edit-btn");
   const deleteAction = button.classList.contains("trash-btn");
 
+  const groceryItem = button.parentNode.parentNode;
+  const groceryItemId = groceryItem.id;
+
   if (editAction) {
-    console.log("edit");
-    console.log(button.parentNode.parentNode.id);
+    isEditing = true;
+    const groceryItemName = groceryItem.querySelector(".grocery-name").innerHTML;
+    input.value = groceryItemName;
+    itemId = groceryItemId;
+    changeButtonHandler();
   }
+
   if (deleteAction) {
-    console.log("delete");
+    document.getElementById(groceryItemId).remove();
+    groceryItems = groceryItems.filter((item) => item.id !== groceryItemId);
   }
 }
+
+function changeButtonHandler() {
+  const submitButton = document.querySelector(".btn-primary");
+  isEditing ? (submitButton.innerHTML = "Edit") : (submitButton.innerHTML = "Submit");
+}
+

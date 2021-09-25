@@ -10,10 +10,27 @@ groceryList.addEventListener("click", itemActionsHandler);
 const clearListButton = document.querySelector(".reset-btn");
 clearListButton.addEventListener("click", resetAppHandler);
 
+const alertBox = document.querySelector(".alert");
+
 let inputText = null;
 let itemId = null;
 let isEditing = false;
 let groceryItems = [];
+
+function alertHandler(message, colorCode) {
+  if (colorCode === "red") {
+    alertBox.textContent = message;
+    alertBox.classList.add("warn");
+  }
+  if (colorCode === "green") {
+    alertBox.textContent = message;
+    alertBox.classList.add("success");
+  }
+
+  setTimeout(() => {
+    alertBox.className = "alert";
+  }, 2000);
+}
 
 function resetAppHandler() {
   groceryList.innerHTML = "";
@@ -33,6 +50,7 @@ function onSubmitHandler(ev) {
 
   const enteredText = input.value.trim();
   if (!enteredText) {
+    alertHandler("Please enter a value", "red");
     return;
   }
 
@@ -45,6 +63,8 @@ function onSubmitHandler(ev) {
     };
     groceryItems[existingItemIndex] = updatedItem;
     updatedDisplayedItem(itemId, enteredText);
+
+    alertHandler("Items has been edited", "green");
 
     inputText = null;
     itemId = null;
@@ -62,6 +82,7 @@ function onSubmitHandler(ev) {
   groceryItems.push(groceryItem);
   displayItem(groceryItem);
 
+  alertHandler("Item has been added", "green");
   form.reset();
 }
 
@@ -137,6 +158,7 @@ function itemActionsHandler(ev) {
   if (deleteAction) {
     document.getElementById(groceryItemId).remove();
     groceryItems = groceryItems.filter((item) => item.id !== groceryItemId);
+    alertHandler("Item removed", "red");
   }
 }
 
@@ -144,4 +166,3 @@ function changeButtonHandler() {
   const submitButton = document.querySelector(".btn-primary");
   isEditing ? (submitButton.innerHTML = "Edit") : (submitButton.innerHTML = "Submit");
 }
-

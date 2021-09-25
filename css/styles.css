@@ -137,6 +137,19 @@ ul {
   left: 4em;
   padding: 1em 2.4em;
   text-align: center;
-  background-color: tomato;
   border-radius: 4px;
+  transform: translateX(-130%);
+  transition: 0.2s ease-in-out;
+}
+
+.success {
+  transform: translateX(0);
+  color: #518a5f;
+  background-color: #d4edda;
+}
+
+.warn {
+  transform: translateX(0);
+  color: #8b3f46;
+  background-color: #f8d7da;
 }
